@@ -1,4 +1,3 @@
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -25,32 +24,37 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
   late AnimationController animationController;
 
   late Animation<double> marioX;
-  // Add other animations here
-  // late Animation<double> marioY;
-  // late Animation<int> marioFrame;
-  // late Animation<double> blockY;
-  // late Animation<int> blockFrame;
-  // late Animation<double> coinY;
+  late Animation<double> marioY;
 
   @override
   void initState() {
     super.initState();
 
-    animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 8));
-
-    List<double> wgts = [1.0, 1.0, 1.0, 1.0, 1.0];
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    );
 
     marioX = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.5), weight: wgts[0]),
-      TweenSequenceItem(tween: Tween(begin: 0.5, end: 0.5), weight: wgts[1]),
-      TweenSequenceItem(tween: Tween(begin: 0.5, end: 0.5), weight: wgts[2]),
-      TweenSequenceItem(tween: Tween(begin: 0.5, end: 0.5), weight: wgts[3]),
-      TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.0), weight: wgts[4]),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.5), weight: 2.0),
+      TweenSequenceItem(tween: Tween(begin: 0.5, end: 0.5), weight: 1.0),
+      TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.0), weight: 2.0),
     ]).animate(animationController);
 
-    // Start the animation
-    animationController.forward();
+    marioY = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 2.0),
+      TweenSequenceItem(
+          tween: Tween(begin: 0.0, end: -1.0)
+              .chain(CurveTween(curve: Curves.easeOut)),
+          weight: 0.5),
+      TweenSequenceItem(
+          tween: Tween(begin: -1.0, end: 0.0)
+              .chain(CurveTween(curve: Curves.easeIn)),
+          weight: 0.5),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 2.0),
+    ]).animate(animationController);
+
+    animationController.repeat();
   }
 
   @override
@@ -63,22 +67,24 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlue,
-      body: Stack(
-        children: [
-          AnimatedBuilder(
-            animation: animationController,
-            builder: (context, child) {
-              return Transform.translate(
-                offset:
-                    Offset(marioX.value * MediaQuery.of(context).size.width, 0),
-                child: const Image(
-                  image: AssetImage("lib/assets/mario_1.png"),
-                ),
-              );
-            },
-          ),
-          // Add other animated widgets here
-        ],
+      body: AnimatedBuilder(
+        animation: animationController,
+        builder: (context, child) {
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: Transform.translate(
+              offset: Offset(
+                marioX.value * MediaQuery.of(context).size.width,
+                marioY.value * 100,
+              ),
+              child: const Image(
+                image: AssetImage("lib/assets/mario_1.png"),
+                width: 50,
+                height: 50,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
