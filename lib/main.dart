@@ -25,7 +25,6 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
   late Animation<double> marioX;
   late Animation<double> marioY;
-  late Animation<int> marioFrame;
 
   @override
   void initState() {
@@ -33,7 +32,7 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4), // Increase speed
+      duration: const Duration(seconds: 4),
     );
 
     marioX = TweenSequence<double>([
@@ -64,7 +63,7 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
     super.dispose();
   }
 
-  int getCurrentFrame(double xValue, double yValue) {
+  int getMarioFrame(double xValue, double yValue) {
     if (xValue < 0.5) {
       // Walking before the jump
       return xValue % 0.1 < 0.05 ? 3 : 4;
@@ -80,6 +79,14 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
     }
   }
 
+  int getBlockFrame(double yValue) {
+    if (yValue == -1.0) {
+      return 2;
+    } else {
+      return 1;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,21 +94,43 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
       body: AnimatedBuilder(
         animation: animationController,
         builder: (context, child) {
-          int currentFrame = getCurrentFrame(marioX.value, marioY.value);
-          return Align(
-            alignment: Alignment.centerLeft,
-            child: Transform.translate(
-              offset: Offset(
-                marioX.value * MediaQuery.of(context).size.width,
-                marioY.value * 100,
+          int marioFrame = getMarioFrame(marioX.value, marioY.value);
+          int blockFrame = getBlockFrame(marioY.value);
+
+          return Stack(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Transform.translate(
+                  offset: Offset(
+                    marioX.value * MediaQuery.of(context).size.width,
+                    marioY.value * 100,
+                  ),
+                  child: Image.asset(
+                    "lib/assets/mario_$marioFrame.png",
+                    gaplessPlayback: true,
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
               ),
-              child: Image.asset(
-                "lib/assets/mario_$currentFrame.png",
-                gaplessPlayback: true,
-                width: 50,
-                height: 50,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Transform.translate(
+                  offset: Offset(
+                    MediaQuery.of(context).size.width * 0.5,
+                    MediaQuery.of(context).size.height *
+                        -0.19, // Adjust block position
+                  ),
+                  child: Image.asset(
+                    "lib/assets/block_$blockFrame.png",
+                    gaplessPlayback: true,
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
               ),
-            ),
+            ],
           );
         },
       ),
