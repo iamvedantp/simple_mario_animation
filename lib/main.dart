@@ -34,7 +34,7 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 3),
     );
 
     marioX = TweenSequence<double>([
@@ -72,10 +72,10 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
     coinY = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 3.0),
       TweenSequenceItem(
-          tween: Tween(begin: -0.18, end: -0.28),
+          tween: Tween(begin: -0.18, end: -0.32),
           weight: 0.25), // Coin jumps higher
       TweenSequenceItem(
-          tween: Tween(begin: -0.28, end: -0.18),
+          tween: Tween(begin: -0.32, end: -0.18),
           weight: 0.25), // Coin comes down
       TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0),
     ]).animate(animationController);
@@ -115,6 +115,9 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.lightBlue,
       body: AnimatedBuilder(
@@ -129,14 +132,15 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
                 alignment: Alignment.centerLeft,
                 child: Transform.translate(
                   offset: Offset(
-                    marioX.value * MediaQuery.of(context).size.width,
+                    marioX.value *
+                        (screenWidth - 80), // Adjust Mario's X position
                     marioY.value * 100,
                   ),
                   child: Image.asset(
                     "lib/assets/mario_$marioFrame.png",
                     gaplessPlayback: true,
-                    width: 50,
-                    height: 50,
+                    width: 80, // Increased width
+                    height: 80, // Increased height
                   ),
                 ),
               ),
@@ -144,9 +148,8 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
                 alignment: Alignment.centerLeft,
                 child: Transform.translate(
                   offset: Offset(
-                    MediaQuery.of(context).size.width * 0.5,
-                    MediaQuery.of(context).size.height *
-                        coinY.value, // Adjust coin position
+                    screenWidth * 0.5 - 15, // Center the coin horizontally
+                    screenHeight * coinY.value - 10, // Adjust coin position
                   ),
                   child: Image.asset(
                     "lib/assets/coin.png",
@@ -160,9 +163,9 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
                 alignment: Alignment.centerLeft,
                 child: Transform.translate(
                   offset: Offset(
-                    MediaQuery.of(context).size.width * 0.5,
-                    MediaQuery.of(context).size.height *
-                        blockY.value, // Adjust block position
+                    screenWidth * 0.5 - 25, // Center the block horizontally
+                    screenHeight * blockY.value -
+                        10, // Adjust block position closer to Mario
                   ),
                   child: Image.asset(
                     "lib/assets/block_$blockFrame.png",
