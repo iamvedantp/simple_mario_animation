@@ -9,6 +9,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'It\'s a me, Mario!',
+      debugShowCheckedModeBanner: false,
       home: MarioAnimationDemo(),
     );
   }
@@ -21,6 +22,9 @@ class MarioAnimationDemo extends StatefulWidget {
 
 class MarioAnimationDemoState extends State<MarioAnimationDemo>
     with SingleTickerProviderStateMixin {
+  static const int jumpCount =
+      5; // Change this value to set the number of jumps
+
   late AnimationController animationController;
 
   late Animation<double> marioX;
@@ -34,51 +38,61 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 5),
     );
 
     marioX = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.5), weight: 2.0),
       TweenSequenceItem(
-          tween: Tween(begin: 0.5, end: 0.5),
-          weight: 1.0), // Stop before jump for 1 second
+          tween: Tween(begin: 0.5, end: 0.5), weight: 3.0), // Stop for jumps
       TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.0), weight: 2.0),
     ]).animate(animationController);
 
-    marioY = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 3.0),
-      TweenSequenceItem(
+    List<TweenSequenceItem<double>> marioYSequence = [];
+    marioYSequence.add(
+        TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 2.0));
+    for (int i = 0; i < jumpCount; i++) {
+      marioYSequence.add(TweenSequenceItem(
           tween: Tween(begin: 0.0, end: -1.0)
               .chain(CurveTween(curve: Curves.easeOut)),
-          weight: 0.5),
-      TweenSequenceItem(
+          weight: 0.3 / jumpCount));
+      marioYSequence.add(TweenSequenceItem(
           tween: Tween(begin: -1.0, end: 0.0)
               .chain(CurveTween(curve: Curves.easeIn)),
-          weight: 0.5),
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 2.0),
-    ]).animate(animationController);
+          weight: 0.3 / jumpCount));
+    }
+    marioYSequence.add(
+        TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 2.0));
 
-    blockY = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 3.0),
-      TweenSequenceItem(
-          tween: Tween(begin: -0.18, end: -0.22),
-          weight: 0.25), // Block jumps up
-      TweenSequenceItem(
-          tween: Tween(begin: -0.22, end: -0.18),
-          weight: 0.25), // Block comes down
-      TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0),
-    ]).animate(animationController);
+    marioY = TweenSequence<double>(marioYSequence).animate(animationController);
 
-    coinY = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 3.0),
-      TweenSequenceItem(
-          tween: Tween(begin: -0.18, end: -0.32),
-          weight: 0.25), // Coin jumps higher
-      TweenSequenceItem(
-          tween: Tween(begin: -0.32, end: -0.18),
-          weight: 0.25), // Coin comes down
-      TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0),
-    ]).animate(animationController);
+    List<TweenSequenceItem<double>> blockYSequence = [];
+    blockYSequence.add(
+        TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0));
+    for (int i = 0; i < jumpCount; i++) {
+      blockYSequence.add(TweenSequenceItem(
+          tween: Tween(begin: -0.18, end: -0.22), weight: 0.3 / jumpCount));
+      blockYSequence.add(TweenSequenceItem(
+          tween: Tween(begin: -0.22, end: -0.18), weight: 0.3 / jumpCount));
+    }
+    blockYSequence.add(
+        TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0));
+
+    blockY = TweenSequence<double>(blockYSequence).animate(animationController);
+
+    List<TweenSequenceItem<double>> coinYSequence = [];
+    coinYSequence.add(
+        TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0));
+    for (int i = 0; i < jumpCount; i++) {
+      coinYSequence.add(TweenSequenceItem(
+          tween: Tween(begin: -0.18, end: -0.32), weight: 0.3 / jumpCount));
+      coinYSequence.add(TweenSequenceItem(
+          tween: Tween(begin: -0.32, end: -0.18), weight: 0.3 / jumpCount));
+    }
+    coinYSequence.add(
+        TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0));
+
+    coinY = TweenSequence<double>(coinYSequence).animate(animationController);
 
     animationController.repeat();
   }
@@ -168,7 +182,7 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
                         10, // Adjust block position closer to Mario
                   ),
                   child: Image.asset(
-                    "lib/assets/block_$blockFrame.png",
+                    "lib/assets/block_1.png",
                     gaplessPlayback: true,
                     width: 50,
                     height: 50,
