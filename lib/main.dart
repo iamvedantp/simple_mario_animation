@@ -25,6 +25,8 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
   late Animation<double> marioX;
   late Animation<double> marioY;
+  late Animation<double> blockY;
+  late Animation<double> coinY;
 
   @override
   void initState() {
@@ -32,17 +34,19 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
     animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 5),
     );
 
     marioX = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.5), weight: 2.0),
-      TweenSequenceItem(tween: Tween(begin: 0.5, end: 0.5), weight: 1.0),
+      TweenSequenceItem(
+          tween: Tween(begin: 0.5, end: 0.5),
+          weight: 1.0), // Stop before jump for 1 second
       TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.0), weight: 2.0),
     ]).animate(animationController);
 
     marioY = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 2.0),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 3.0),
       TweenSequenceItem(
           tween: Tween(begin: 0.0, end: -1.0)
               .chain(CurveTween(curve: Curves.easeOut)),
@@ -52,6 +56,28 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
               .chain(CurveTween(curve: Curves.easeIn)),
           weight: 0.5),
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 2.0),
+    ]).animate(animationController);
+
+    blockY = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 3.0),
+      TweenSequenceItem(
+          tween: Tween(begin: -0.18, end: -0.22),
+          weight: 0.25), // Block jumps up
+      TweenSequenceItem(
+          tween: Tween(begin: -0.22, end: -0.18),
+          weight: 0.25), // Block comes down
+      TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0),
+    ]).animate(animationController);
+
+    coinY = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 3.0),
+      TweenSequenceItem(
+          tween: Tween(begin: -0.18, end: -0.28),
+          weight: 0.25), // Coin jumps higher
+      TweenSequenceItem(
+          tween: Tween(begin: -0.28, end: -0.18),
+          weight: 0.25), // Coin comes down
+      TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0),
     ]).animate(animationController);
 
     animationController.repeat();
@@ -65,23 +91,23 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
   int getMarioFrame(double xValue, double yValue) {
     if (xValue < 0.5) {
-      // Walking before the jump
+      // Walking before the stop
       return xValue % 0.1 < 0.05 ? 3 : 4;
-    } else if (xValue > 0.5) {
-      // Walking after the jump
-      return xValue % 0.1 < 0.05 ? 3 : 4;
+    } else if (xValue == 0.5 && yValue == 0.0) {
+      // Stopping in the center
+      return 1;
     } else if (yValue < 0.0) {
       // Jumping
       return 5;
     } else {
-      // Stopping in the center
-      return 1;
+      // Walking after the jump
+      return xValue % 0.1 < 0.05 ? 3 : 4;
     }
   }
 
   int getBlockFrame(double yValue) {
-    if (yValue == -1.0) {
-      return 2;
+    if (yValue < 0.0) {
+      return 2; // When block jumps up, change to block_2.png
     } else {
       return 1;
     }
@@ -120,7 +146,23 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
                   offset: Offset(
                     MediaQuery.of(context).size.width * 0.5,
                     MediaQuery.of(context).size.height *
-                        -0.19, // Adjust block position
+                        coinY.value, // Adjust coin position
+                  ),
+                  child: Image.asset(
+                    "lib/assets/coin.png",
+                    gaplessPlayback: true,
+                    width: 30,
+                    height: 30,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Transform.translate(
+                  offset: Offset(
+                    MediaQuery.of(context).size.width * 0.5,
+                    MediaQuery.of(context).size.height *
+                        blockY.value, // Adjust block position
                   ),
                   child: Image.asset(
                     "lib/assets/block_$blockFrame.png",
