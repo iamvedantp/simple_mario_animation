@@ -2,13 +2,14 @@
 
 This Flutter project demonstrates a simple animation where Mario walks, jumps multiple times, and interacts with a block and a coin. The number of jumps Mario makes is configurable.
 
-https://github.com/user-attachments/assets/c7fb9c54-b0ec-44f8-9825-1945d68780d2
+https://github.com/user-attachments/assets/4f5222a6-e032-42eb-bd05-e3cfcc40308d
+
 ![Screenshot_1722272187](https://github.com/user-attachments/assets/95a48569-6160-4df8-b622-c0b4b585928a)
 
 ## Features
 
 - Mario walks, stops, jumps multiple times, and then continues walking.
-- A block and a coin that animate in sync with Mario's jumps.
+- A block and a coin that animates in sync with Mario's jumps.
 - Easily configurable jump count.
 
 ## Getting Started
