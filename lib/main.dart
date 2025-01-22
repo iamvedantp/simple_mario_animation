@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'It\'s a me, Mario!',
       debugShowCheckedModeBanner: false,
       home: MarioAnimationDemo(),
@@ -16,6 +18,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MarioAnimationDemo extends StatefulWidget {
+  const MarioAnimationDemo({super.key});
+
   @override
   State<StatefulWidget> createState() => MarioAnimationDemoState();
 }
@@ -23,7 +27,7 @@ class MarioAnimationDemo extends StatefulWidget {
 class MarioAnimationDemoState extends State<MarioAnimationDemo>
     with SingleTickerProviderStateMixin {
   static const int jumpCount =
-      5; // Change this value to set the number of jumps
+      3; // Change this value to set the number of jumps
 
   late AnimationController animationController;
 
@@ -41,6 +45,7 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
       duration: const Duration(seconds: 5),
     );
 
+// Animation sequence for Mario's horizontal movement (walking and stopping)
     marioX = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.5), weight: 2.0),
       TweenSequenceItem(
@@ -48,6 +53,7 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
       TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.0), weight: 2.0),
     ]).animate(animationController);
 
+// Animation sequence for Mario's vertical movement (jumping)
     List<TweenSequenceItem<double>> marioYSequence = [];
     marioYSequence.add(
         TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.0), weight: 2.0));
@@ -66,6 +72,7 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
 
     marioY = TweenSequence<double>(marioYSequence).animate(animationController);
 
+// Animation sequence for the block's vertical movement
     List<TweenSequenceItem<double>> blockYSequence = [];
     blockYSequence.add(
         TweenSequenceItem(tween: Tween(begin: -0.18, end: -0.18), weight: 2.0));
@@ -138,7 +145,7 @@ class MarioAnimationDemoState extends State<MarioAnimationDemo>
         animation: animationController,
         builder: (context, child) {
           int marioFrame = getMarioFrame(marioX.value, marioY.value);
-          int blockFrame = getBlockFrame(marioY.value);
+          // int blockFrame = getBlockFrame(marioY.value);
 
           return Stack(
             children: [
